@@ -16,7 +16,7 @@ let satelliteStreets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/sate
 });
 
 // Create a base layer that holds both maps.
-let baseMpas = {
+let baseMaps = {
     "Streets": streets,
     "Satellite Streets": satelliteStreets
 };
@@ -34,12 +34,21 @@ let myStyle = {
 let map = L.map('mapid', {
     center: [43.7, -79.3],
     zoom: 11,
-    layers: [satelliteStreets]
+    layers: [satelliteStreets, streets]
 });
+
+// Add layers to the map.
 
 // Grabbing our GeoJSON data.
 d3.json(torontoHoods).then(function(data) {
     console.log(data);
     // Creaing a GeoJSON layer with the retreived data.
-    L.geoJSON(data).addTo(map);
+    L.geoJSON(data, {
+        onEachFeature: (function(feature, layer) {
+            console.log(layer);
+            layer.bindPopup("<h3>Neighborhood: " + feature.properties.AREA_NAME + "<h3/>")
+        }),
+        fillColor: "yellow",
+        weight: 1,
+    }).addTo(map);
 });
